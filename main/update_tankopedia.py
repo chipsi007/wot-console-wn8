@@ -1,5 +1,5 @@
 from . import wgapi
-from .database import t_tankopedia as db_tp
+from .database import table_tankopedia as db_tp
 
 
 #Update changed and add new tankopedia tanks.

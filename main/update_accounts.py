@@ -2,7 +2,7 @@ import time
 
 
 from . import wgapi
-from .database import t_accounts as db
+from .database import table_accounts as db
 
 
 #Main routine to reload player account ids and corresponding server names from WG 7 days rating.

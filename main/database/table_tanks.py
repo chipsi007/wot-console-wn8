@@ -4,7 +4,7 @@ import pandas as pd
 from .conn import conn, cur
 
 
-#Functions for tanks table.
+#Functions for 'tanks' table.
 
 
 def get_percentiles_data(tank_ids):
@@ -40,68 +40,53 @@ def get_dataframe(tank_ids, columns, min_battles=1):
 
 
 def insert_tank(tank_data):
-    #Process player and insert tanks into "tanks" table.
-    x = tank_data
+    '''Insert one tank into database.
 
-    #Checking if the tank is already in the database for the same user.
-    last_battle_time = cur.execute('''
-        SELECT last_battle_time FROM tanks
-        WHERE tank_id = ? AND account_id = ? AND server = ?;
-    ''', (x['tank_id'], x['account_id'], x['server'])).fetchone()
-
-    #If found.
-    if last_battle_time:
-        last_battle_time = last_battle_time[0]
-
-        #Do nothing if the data contains the same timestamp.
-        if last_battle_time == x['last_battle_time']:
-            return
-
-        #Delete if data contains newer timestamp.
-        cur.execute('''
-            DELETE FROM tanks
-            WHERE tank_id = ? AND last_battle_time = ? AND account_id = ? AND server = ?;
-        ''', (x['tank_id'], last_battle_time, x['account_id'], x['server']))
-
-    query = '''
-        INSERT INTO tanks (
-            tank_id,                        last_battle_time,               account_id,
-            server,                         battle_life_time,               battles,
-            capture_points,                 damage_assisted_radio,          damage_assisted_track,
-            damage_dealt,                   damage_received,                direct_hits_received,
-            dropped_capture_points,         explosion_hits,                 explosion_hits_received,
-            frags,                          hits,                           losses,
-            mark_of_mastery,                max_frags,                      max_xp,
-            no_damage_direct_hits_received, piercings,                      piercings_received,
-            shots,                          spotted,                        survived_battles,
-            trees_cut,                      wins,                           xp )
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    Arguments:
+        tank_data:Dict[str, num] - data dictionary for a tank.
+    Returns:
+        None
     '''
 
-    values = (
-        x['tank_id'],                        x['last_battle_time'],      x['account_id'],
-        x['server'],                         x['battle_life_time'],      x['battles'],
-        x['capture_points'],                 x['damage_assisted_radio'], x['damage_assisted_track'],
-        x['damage_dealt'],                   x['damage_received'],       x['direct_hits_received'],
-        x['dropped_capture_points'],         x['explosion_hits'],        x['explosion_hits_received'],
-        x['frags'],                          x['hits'],                  x['losses'],
-        x['mark_of_mastery'],                x['max_frags'],             x['max_xp'],
-        x['no_damage_direct_hits_received'], x['piercings'],             x['piercings_received'],
-        x['shots'],                          x['spotted'],               x['survived_battles'],
-        x['trees_cut'],                      x['wins'],                  x['xp']
-    )
+    columns = [
+        'tank_id',                        'last_battle_time',      'account_id',
+        'server',                         'battle_life_time',      'battles',
+        'capture_points',                 'damage_assisted_radio', 'damage_assisted_track',
+        'damage_dealt',                   'damage_received',       'direct_hits_received',
+        'dropped_capture_points',         'explosion_hits',        'explosion_hits_received',
+        'frags',                          'hits',                  'losses',
+        'mark_of_mastery',                'max_frags',             'max_xp',
+        'no_damage_direct_hits_received', 'piercings',             'piercings_received',
+        'shots',                          'spotted',               'survived_battles',
+        'trees_cut',                      'wins',                  'xp'
+    ]
 
+    columns_str = ', '.join(columns)
+    question_marks = ', '.join(['?' for _ in columns])
+
+    #Triggers replace if there is a tank_id for the same player in database.
+    query = f'INSERT OR REPLACE INTO tanks ({columns_str}) VALUES ({question_marks});'
+    values = [tank_data[name] for name in columns]
     cur.execute(query, values)
 
 
 def cleanup_space(tank_id, min_battles):
+    '''Remove up to 10 records with less than minimum number of battles.
+    Or remove 50 oldest records.
+
+    Arguments:
+        tank_id:int     - tank_id to remove rows of.
+        min_battles:int - minimum battles for the tank_id.
+    Returns:
+        None
+    '''
 
     #Getting count of tanks with battles less than minimum.
-    cur.execute('''
+    count = cur.execute('''
         SELECT COUNT(*) FROM tanks
         WHERE tank_id = ? AND battles < ?;
-    ''', (tank_id, min_battles))
-    count = cur.fetchone()[0]
+    ''', (tank_id, min_battles)).fetchone()[0]
+
 
     if count > 0:
         #Deleting oldest 50 with battles less than minimum.
@@ -126,6 +111,15 @@ def cleanup_space(tank_id, min_battles):
 
 
 def insert_player(player_data, tankopedia):
+    '''Insert tanks for one player.
+    
+    Arguments:
+        player_data:List[Obj]     - player tanks as list of dictionaries.
+        tankopedia:Dict[str, Obj] - tankopedia object.
+    Returns:
+        None
+    '''
+
     for tank_data in player_data:
         tank_id = tank_data['tank_id']
 

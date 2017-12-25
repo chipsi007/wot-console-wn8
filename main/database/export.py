@@ -5,7 +5,7 @@ import pickle
 from .conn import conn, cur
 
 
-#Export data as list of dictionaries.
+#Export data as list of dictionaries for remote host.
 
 
 def export_tankopedia():
@@ -51,5 +51,45 @@ def export_wn8_exp_values():
             'expDef':     row[4],
             'expWinRate': row[5]
         })
+
+    return output
+
+
+def export_history():
+    '''Export history values for all tanks. Export every timestamp except for current week.
+
+    Returns:
+        List[Dict[str, Any([int, List[num]])]
+    '''
+
+    columns = [
+        'tank_id', 'created_at', 'popularity_index',
+        'battle_life_time', 'capture_points', 'damage_assisted_radio',
+        'damage_dealt', 'damage_received', 'direct_hits_received',
+        'frags', 'hits', 'losses', 'piercings', 'piercings_received',
+        'shots', 'spotted', 'survived_battles', 'wins', 'xp'
+    ]
+
+    columns_str = ', '.join(columns)
+
+    cur.execute('SELECT DISTINCT(tank_id) FROM history;')
+    tank_ids = [x[0] for x in cur]
+
+    output = []
+    for tank_id in tank_ids:
+        cur.execute(f'''
+            SELECT {columns_str} FROM history
+            WHERE tank_id = ?
+                AND strftime('%Y%W', created_at, 'unixepoch') != strftime('%Y%W', 'now')
+            ORDER BY created_at DESC LIMIT 50
+        ''', [tank_id])
+
+        rows = cur.fetchall()
+
+        if rows:
+            #Every field except for tank_id is an array of numbers.
+            temp_dict = {key: [x[k] for x in rows] for k, key in enumerate(columns)}
+            temp_dict['tank_id'] = tank_id
+            output.append(temp_dict)
 
     return output

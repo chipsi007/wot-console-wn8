@@ -8,20 +8,23 @@ With PC community moving towards WN8 v30 expected values, the task of generating
 From OCT 2017 merged with `wot-console-dataminer` for additional features.
 * Fail-proof tankopedia updates.
 * WoT Console player data collection (both xbox & ps4).
-* Calculate percentiles & generic percentiles calculation.
-* WN8 Console expected values calculation.
+* Percentiles & generic percentiles calculation.
+* WN8 Console-specific expected values calculation (based on WN8 PC v30).
 
 
 #### Data collection methodology:
-* First 1000 tanks for each tank id stored in the database without any checks.
-* After first 1000 the tank needs to have `tier * 10 + tier * 10 / 2` battles to be added in the database.
-* If there are at least 1100 tanks for the tank id:
-  * Deleting up to 50 items (if available) with less than `tier * 10 + tier * 10 / 2` number of battles starting with the ones with oldest `last battle time` timestamp.
+* First 1000 tanks for each tank_id are collected without any checks.
+* Set minumum number of battles as `tier * 10 + tier * 10 / 2` for each tank_id with more than 1000 tanks in the database.
+* If the number of tanks with the same tank_id hit 1100:
+  * Deleting up to 50 tanks with less than `tier * 10 + tier * 10 / 2` battles starting with oldest `last battle time` timestamp.
   * Or deleting 10 items with oldest `last battle time` timestamp.
 
 
-#### How to run:
-The whole repository meant to be run as a daily cron job.
-* python3.6, pip3 and unix shell required.
-* `setup.sh` to setup including setting up venv.
-* `run.sh` to run from created venv.
+#### How to run on Linux/Mac:
+The whole repository meant to be run as a cron job once a day, although manual use is also okay.
+* install python3.6
+* setup `setup.sh`
+  * python virtual environment setup.
+  * creating `main/secret.py` with WG app_id & hosts which should receive the data.
+* run `run.sh`
+  * switch to venv and run `run.py`

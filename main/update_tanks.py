@@ -3,9 +3,9 @@ import random
 
 
 from . import wgapi
-from .database.t_tankopedia import get_tankopedia
-from .database.t_tanks import insert_player
-from .database import t_accounts as db_accounts
+from .database.table_tankopedia import get_tankopedia
+from .database.table_tanks import insert_player
+from .database import table_accounts as db_accounts
 
 
 # Update tanks data.

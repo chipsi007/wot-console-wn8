@@ -2,9 +2,9 @@ import time
 import numpy as np
 
 
-from .database.t_tankopedia import get_distinct_tankids, get_tiertype_tankids
-from .database.t_tanks import get_percentiles_data as get_data
-from .database import t_percentiles as db
+from .database.table_tankopedia import get_distinct_tankids, get_tiertype_tankids
+from .database.table_tanks import get_percentiles_data as get_data
+from .database import table_percentiles as db
 
 
 #Main routine to calculate percentiles and generic percentiles.

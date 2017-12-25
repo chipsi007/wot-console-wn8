@@ -2,9 +2,9 @@ import time
 import numpy as np
 
 
-from .database.t_tanks import get_dataframe
-from .database.t_tankopedia import get_tankopedia
-from .database import t_wn8 as db
+from .database.table_tanks import get_dataframe
+from .database.table_tankopedia import get_tankopedia
+from .database import table_wn8 as db
 from .wn8pc import wn8pc
 
 

@@ -3,6 +3,8 @@ from main import *
 
 def main():
 
+    create_database()
+
     print('######## Updating tankopedia...')
     update_tankopedia()
 
@@ -21,7 +23,7 @@ def main():
     print('######## Calculating history...')
     calculate_history()
 
-    print('######## Pushing the data...')
+    print('######## Pushing the data to remote host...')
     push_data()
 
 

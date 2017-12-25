@@ -1,3 +1,4 @@
+from .database.create import main as create_database
 from .update_tankopedia import main as update_tankopedia
 from .update_accounts import main as update_accounts
 from .update_tanks import main as update_tanks

@@ -8,8 +8,6 @@ source ./bin/activate
 
 pip3.6 install -r requirements.txt
 
-python3.6 scripts/init_database.py
-
 #Create secret.py
 DEST=main/secret.py
 if [ ! -f $DEST ]; then
@@ -19,6 +17,7 @@ if [ ! -f $DEST ]; then
   echo "hosts = [" >> $DEST
   echo "    #{'url': 'http://127.0.0.1:5000/update/', 'access_key': '12345'}" >> $DEST
   echo "]" >> $DEST
+  echo "#Look inside 'main/push_data.py' to see how the data is pushed."
 fi
 
 deactivate

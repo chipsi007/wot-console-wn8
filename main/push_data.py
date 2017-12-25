@@ -16,16 +16,32 @@ from .secret import hosts
 
 
 def post_data(url, payload):
-    # import gzip
-    # import pickle
+    '''Send post request with payload to the specified url.
+
+    Makes 3 attempts. Prints output to stdout.
+    Reciving API must respond with JSON containing 'status' and 'message' fields.
+    Response field 'status' must be a string containing 'ok' if no errors encountered.
+    If response field 'status' is not 'ok', request considered to be a failure.
+
+    Arguments:
+        url:str - endpoint to send payload to.
+        payload:Dict[str, Obj] - dictionary to be sent as json payload. Must include following fields:
+            name:str       - name of the object.
+            data:List[Obj] - main data to be received, processed & stored.
+            count:int      - count of the items in the 'data' field for basic validation.
+            access_key:str - secret access key for security purpose.
+    Returns:
+        None
+    '''
+
     start = time.time()
 
     attempts, max_attempts = 0, 2
     while attempts < max_attempts:
         try:
             resp = requests.post(url, timeout=15, json=payload).json()
-            status, message = resp['status'], resp['message']
-            assert status == 'ok', message
+            error =  resp['error']
+            assert error is None, error
 
         except requests.exceptions.Timeout:
             print('ERROR: request timeout')
@@ -52,16 +68,11 @@ def post_data(url, payload):
             took = round(time.time() - start, 2)
             kib = round(sys.getsizeof(json.dumps(payload)) / 1024, 2)
             print(f'SUCCESS: Took: {took} s. Size: {kib} KiB')
-            # took = round(time.time() - start, 2)
-            # kib = round(sys.getsizeof(gzip.compress(json.dumps(payload).encode())) / 1024, 2)
-            # print(f'Done. Took: {took} s. Size: {kib} KiB')
-            # took = round(time.time() - start, 2)
-            # kib = round(sys.getsizeof(pickle.dumps(payload)) / 1024, 2)
-            # print(f'Done. Took: {took} s. Size: {kib} KiB')
             return
 
 
 def main():
+    #Iterate through hosts and send pieces of data.
 
     if not any(hosts):
         print('WARNING: No hosts found. Data will not be sent anywhere.')
@@ -85,8 +96,8 @@ def main():
         post_data(url, payload)
 
 
-        #Continue only on sunday.
-        if time.gmtime().tm_wday != 6:
+        #Continue only on monday.
+        if time.gmtime().tm_wday != 0:
             return
 
 
@@ -119,6 +130,18 @@ def main():
         data = db.export_wn8_exp_values()
         payload = {
             'name':       'wn8',
+            'data':       data,
+            'count':      len(data),
+            'access_key': access_key
+        }
+        post_data(url, payload)
+
+
+        #History.
+        print('INFO: Pushing history...')
+        data = db.export_history()
+        payload = {
+            'name':       'history',
             'data':       data,
             'count':      len(data),
             'access_key': access_key

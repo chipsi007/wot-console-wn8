@@ -8,12 +8,10 @@ from .conn import conn, cur
 
 
 def replace_all(exp_values):
-    #Remove all expected values and put new ones.
-
-    cur.execute('DELETE FROM wn8;')
+    #Replace all expected values and put new ones.
     for tank_id, val in exp_values.items():
         cur.execute('''
-            INSERT INTO wn8 (tank_id, expFrag, expDamage, expSpot, expDef, expWinRate)
+            INSERT OR REPLACE INTO wn8 (tank_id, expFrag, expDamage, expSpot, expDef, expWinRate)
             VALUES (?, ?, ?, ?, ?, ?);
         ''', (tank_id, val['expFrag'], val['expDamage'], val['expSpot'], val['expDef'], val['expWinRate']))
     conn.commit()
