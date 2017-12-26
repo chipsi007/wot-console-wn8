@@ -137,4 +137,3 @@ def main():
 
 
     conn.commit()
-    conn.close()
