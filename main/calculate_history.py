@@ -60,6 +60,14 @@ def main():
         rows.append(row)
 
 
+    #In case of empty database.
+    if len(rows) < 5:
+        print('WARNING: Not enough values to calculate history.')
+        print('WARNING: There must be more than 5 tanks with enough data points.')
+        print('WARNING: History was not calculated.')
+        return
+
+
     #Generating 'popularity_index' & updating rows.
     recency_arr = [x['last_battle_time'] for x in rows]
     percentiles = np.percentile(recency_arr, [x / 10 for x in range(0, 1001)])
