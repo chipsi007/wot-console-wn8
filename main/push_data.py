@@ -12,24 +12,27 @@ from .secret import hosts
 
 #Send json-encoded payload in post body of the request.
 #Authorization via 'access_key' in the body.
-#HTTPS must be used for security.
+#HTTPS should be used for security.
 
 
 def post_data(url, payload):
     '''Send post request with payload to the specified url.
+    Makes 2 attempts. Prints output to stdout.
 
-    Makes 3 attempts. Prints output to stdout.
-    Reciving API must respond with JSON containing 'status' and 'message' fields.
-    Response field 'status' must be a string containing 'ok' if no errors encountered.
-    If response field 'status' is not 'ok', request considered to be a failure.
+    Accepts HTTP JSON response:
+        {
+            required "error":None/str - None if no error. String with error message in case of error.
+            optional "time:float      - time took to execute request. Omitted of error is not None.
+        }
 
     Arguments:
         url:str - endpoint to send payload to.
         payload:Dict[str, Obj] - dictionary to be sent as json payload. Must include following fields:
-            name:str       - name of the object.
-            data:List[Obj] - main data to be received, processed & stored.
-            count:int      - count of the items in the 'data' field for basic validation.
-            access_key:str - secret access key for security purpose.
+            name:str          - name of the object.
+            headers:List[str] - headers of items in 'rows' field.
+            rows:List[List]   - actual data as list of lists.
+            count:int         - count of the items in the 'rows' field for basic validation.
+            access_key:str    - secret access key for security purpose.
     Returns:
         None
     '''
@@ -40,7 +43,7 @@ def post_data(url, payload):
     while attempts < max_attempts:
         try:
             resp = requests.post(url, timeout=15, json=payload).json()
-            error =  resp['error']
+            error = resp['error']
             assert error is None, error
 
         except requests.exceptions.Timeout:
@@ -86,11 +89,12 @@ def main():
 
         #Tankopedia.
         print('INFO: Pushing tankopedia...')
-        data = db.export_tankopedia()
+        headers, rows = db.export_tankopedia()
         payload = {
             'name':       'tankopedia',
-            'data':       data,
-            'count':      len(data),
+            'headers':    headers,
+            'rows':       rows,
+            'count':      len(rows),
             'access_key': access_key
         }
         post_data(url, payload)
@@ -103,11 +107,12 @@ def main():
 
         #Percentiles.
         print('INFO: Pushing percentiles...')
-        data = db.export_percentiles()
+        headers, rows = db.export_percentiles()
         payload = {
             'name':       'percentiles',
-            'data':       data,
-            'count':      len(data),
+            'headers':    headers,
+            'rows':       rows,
+            'count':      len(rows),
             'access_key': access_key
         }
         post_data(url, payload)
@@ -115,11 +120,12 @@ def main():
 
         #Percentiles generic.
         print('INFO: Pushing percentiles generic...')
-        data = db.export_percentiles_generic()
+        headers, rows = db.export_percentiles_generic()
         payload = {
             'name':       'percentiles_generic',
-            'data':       data,
-            'count':      len(data),
+            'headers':    headers,
+            'rows':       rows,
+            'count':      len(rows),
             'access_key': access_key
         }
         post_data(url, payload)
@@ -127,11 +133,12 @@ def main():
 
         #WN8.
         print('INFO: Pushing WN8...')
-        data = db.export_wn8_exp_values()
+        headers, rows = db.export_wn8_exp_values()
         payload = {
             'name':       'wn8',
-            'data':       data,
-            'count':      len(data),
+            'headers':    headers,
+            'rows':       rows,
+            'count':      len(rows),
             'access_key': access_key
         }
         post_data(url, payload)
@@ -139,11 +146,13 @@ def main():
 
         #History.
         print('INFO: Pushing history...')
-        data = db.export_history()
+        twenty_weeks_ago = time.time() - 60 * 60 * 24 * 7 * 20
+        headers, rows = db.export_history(min_timestamp=twenty_weeks_ago)
         payload = {
             'name':       'history',
-            'data':       data,
-            'count':      len(data),
+            'headers':    headers,
+            'rows':       rows,
+            'count':      len(rows),
             'access_key': access_key
         }
         post_data(url, payload)
