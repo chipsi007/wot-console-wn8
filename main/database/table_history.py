@@ -13,7 +13,7 @@ def put(list_of_dicts):
         'tank_id', 'created_at', 'popularity_index',
         'battle_life_time', 'capture_points', 'damage_assisted_radio',
         'damage_dealt', 'damage_received', 'direct_hits_received',
-        'frags', 'hits', 'losses', 'piercings', 'piercings_received',
+        'frags', 'hits', 'piercings', 'piercings_received',
         'shots', 'spotted', 'survived_battles', 'wins', 'xp'
     ]
 
@@ -29,6 +29,10 @@ def put(list_of_dicts):
 
 
 def aggregate():
+    '''Aggregate history into 1 record per week per tank_id. Ignore current week.
+
+    Replaces non-aggregated rows with aggregated row with same created_at for all tank_ids.
+    '''
 
     #Get yearweeks as 'YYYYWW' and corresponding timestamps. Ignore current week. UTC time.
     cur.execute('''
@@ -68,7 +72,6 @@ def aggregate():
                 ROUND(AVG(direct_hits_received), 2),
                 ROUND(AVG(frags), 2),
                 ROUND(AVG(hits), 2),
-                ROUND(AVG(losses), 2),
                 ROUND(AVG(piercings), 2),
                 ROUND(AVG(piercings_received), 2),
                 ROUND(AVG(shots), 2),

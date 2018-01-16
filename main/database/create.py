@@ -123,7 +123,6 @@ def main():
             direct_hits_received REAL,
             frags REAL,
             hits REAL,
-            losses REAL,
             piercings REAL,
             piercings_received REAL,
             shots REAL,

@@ -67,7 +67,7 @@ def export_history(min_timestamp=0):
         'tank_id', 'created_at', 'popularity_index',
         'battle_life_time', 'capture_points', 'damage_assisted_radio',
         'damage_dealt', 'damage_received', 'direct_hits_received',
-        'frags', 'hits', 'losses', 'piercings', 'piercings_received',
+        'frags', 'hits', 'piercings', 'piercings_received',
         'shots', 'spotted', 'survived_battles', 'wins', 'xp'
     ]
     columns_str = ', '.join(columns)
