@@ -63,22 +63,22 @@ def aggregate():
             SELECT
                 tank_id,
                 ? AS created_at,
-                ROUND(AVG(popularity_index), 2),
-                ROUND(AVG(battle_life_time), 2),
-                ROUND(AVG(capture_points), 2),
-                ROUND(AVG(damage_assisted_radio), 2),
-                ROUND(AVG(damage_dealt), 2),
-                ROUND(AVG(damage_received), 2),
-                ROUND(AVG(direct_hits_received), 2),
-                ROUND(AVG(frags), 2),
-                ROUND(AVG(hits), 2),
-                ROUND(AVG(piercings), 2),
-                ROUND(AVG(piercings_received), 2),
-                ROUND(AVG(shots), 2),
-                ROUND(AVG(spotted), 2),
-                ROUND(AVG(survived_battles), 2),
-                ROUND(AVG(wins), 2),
-                ROUND(AVG(xp), 2)
+                ROUND(AVG(popularity_index), 3),
+                ROUND(AVG(battle_life_time), 3),
+                ROUND(AVG(capture_points), 3),
+                ROUND(AVG(damage_assisted_radio), 3),
+                ROUND(AVG(damage_dealt), 3),
+                ROUND(AVG(damage_received), 3),
+                ROUND(AVG(direct_hits_received), 3),
+                ROUND(AVG(frags), 3),
+                ROUND(AVG(hits), 3),
+                ROUND(AVG(piercings), 3),
+                ROUND(AVG(piercings_received), 3),
+                ROUND(AVG(shots), 3),
+                ROUND(AVG(spotted), 3),
+                ROUND(AVG(survived_battles), 3),
+                ROUND(AVG(wins), 3),
+                ROUND(AVG(xp), 3)
             FROM history
             WHERE strftime('%Y%W', created_at, 'unixepoch') = ?
             GROUP BY tank_id

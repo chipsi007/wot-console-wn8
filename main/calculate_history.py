@@ -47,7 +47,7 @@ def main():
         for name in ratio_names:
             df[name] = df[name] / df['battles']
         df.drop(columns=['battles'], inplace=True)
-        df = df.agg('median').round(2)
+        df = df.agg('median').round(3)
 
         #Put everything into row.
         row = {
